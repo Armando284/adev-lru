@@ -1,6 +1,11 @@
 import { LinkedNode } from "./interfaces";
 import { isLocalhost } from "./utils";
 
+/**
+ * @template T
+ * @description Implements an LRU (Least Recently Used) Cache with TTL (Time-to-Live) support.
+ * Allows for efficient storage and retrieval of key-value pairs.
+ */
 export default class LRUCache<T> {
   private static instance: LRUCache<any>;
   private readonly capacity: number;
@@ -24,6 +29,12 @@ export default class LRUCache<T> {
     this.hitCount = this.missCount = this.evictionCount = 0;
   }
 
+  /**
+   * Creates or retrieves the singleton instance of the LRU cache.
+   * @template T
+   * @param {number} [capacity=10] - Maximum capacity of the cache.
+   * @returns {LRUCache<T>} The singleton instance of the cache.
+   */
   public static getInstance<T>(capacity: number = 10): LRUCache<T> {
     if (!LRUCache.instance) {
       LRUCache.instance = new LRUCache<T>(capacity);
@@ -31,6 +42,15 @@ export default class LRUCache<T> {
     return LRUCache.instance;
   }
 
+  /**
+   * Inserts or updates an item in the cache.
+   * If the key already exists, it updates its value and moves it to the head.
+   * If the cache exceeds capacity, the least recently used item is evicted.
+   * @param {string} key - The key associated with the value.
+   * @param {T} value - The value to store in the cache.
+   * @param {number} [ttl=60000] - Time-to-Live in milliseconds for the item.
+   * @returns {LRUCache<T>} The current cache instance for chaining.
+   */
   public put(key: string, value: T, ttl: number = 60_000): LRUCache<T> {
     const now = Date.now()
     let node = this.hash.get(key);
@@ -51,6 +71,12 @@ export default class LRUCache<T> {
     return this;
   }
 
+  /**
+   * Retrieves an item from the cache by key.
+   * If the item has expired, it returns undefined and counts as a miss.
+   * @param {string} key - The key to search for.
+   * @returns {T | undefined} The value associated with the key, or undefined if not found or expired.
+   */
   public get(key: string): T | undefined {
     const node = this.hash.get(key);
     if (!node) {
@@ -71,6 +97,9 @@ export default class LRUCache<T> {
     return node.value;
   }
 
+  /**
+   * Clears all items from the cache.
+   */
   public clear(): void {
     this.hash.clear()
     this.head = this.tail = undefined
@@ -130,16 +159,27 @@ export default class LRUCache<T> {
     return totalRequests === 0 ? 0 : this.evictionCount / totalRequests;
   }
 
+  /**
+   * Resets cache performance metrics.
+   */
   public clearMetrics(): void {
     this.hitCount = this.missCount = this.evictionCount = 0
   }
 
+  /**
+   * Logs cache performance metrics to the console.
+   * Includes hit rate, miss rate, and eviction rate.
+   */
   public logMetrics(): void {
     console.log(`Hit rate: ${this.getHitRate()}`);
     console.log(`Miss rate: ${this.getMissRate()}`);
     console.log(`Eviction rate: ${this.getEvictionRate()}`);
   }
 
+  /**
+   * Logs debugging information about the cache to the console.
+   * Includes the current state of the linked list and the hash map.
+   */
   public debugLRU(): void {
     console.log('DEBUG LRU CACHE ⚡')
     let node: LinkedNode<T> | undefined = this.head

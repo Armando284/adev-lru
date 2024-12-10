@@ -22,7 +22,7 @@ export default class LRUCache<T> {
     this.hash = new Map();
     this.head = this.tail = undefined;
 
-    globalThis.debugLRU = this.debugLRU.bind(this);
+    (globalThis as any).debugLRU = this.debugLRU.bind(this);
 
     this.hitCount = this.missCount = this.evictionCount = 0;
   }

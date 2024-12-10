@@ -1,6 +1,6 @@
 # LRU Cache - TypeScript Implementation
 
-[![npm version](https://badge.fury.io/js/lru-cache-ts.svg)](https://badge.fury.io/js/lru-cache-ts)
+[![npm version](https://badge.fury.io/js/adev-lru.svg)](https://badge.fury.io/js/adev-lru)
 
 A simple, efficient, and customizable **LRU Cache** (Least Recently Used Cache) implementation in TypeScript. This package offers O(1) access for retrieving and inserting data, and it automatically evicts the least recently used items when the cache exceeds its set capacity.
 
@@ -35,9 +35,9 @@ This package is suitable for use in caching data in client-side applications, ba
 You can install the package via npm or yarn:
 
 ```bash
-npm install lru-cache-ts
+npm install adev-lru
 # or
-yarn add lru-cache-ts
+yarn add adev-lru
 ```
 
 ## Usage
@@ -45,7 +45,7 @@ yarn add lru-cache-ts
 After installation, you can use the LRU Cache in your application like so:
 
 ```typescript
-import LRUCache from 'lru-cache-ts';
+import LRUCache from 'adev-lru';
 
 const cache = LRUCache.getInstance<number>(3);
 

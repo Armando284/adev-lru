@@ -22,9 +22,7 @@ export default class LRUCache<T> {
     this.hash = new Map();
     this.head = this.tail = undefined;
 
-    if (isLocalhost()) {
-      (window as any).debugLRU = this.debugLRU.bind(this);
-    }
+    globalThis.debugLRU = this.debugLRU.bind(this);
 
     this.hitCount = this.missCount = this.evictionCount = 0;
   }
@@ -103,6 +101,7 @@ export default class LRUCache<T> {
   public clear(): void {
     this.hash.clear()
     this.head = this.tail = undefined
+    this.clearMetrics()
   }
 
   private prepend(key: string, value: T, ttl: number): LinkedNode<T> {

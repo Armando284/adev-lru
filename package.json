@@ -1,6 +1,6 @@
 {
   "name": "adev-lru",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A lightweight and efficient LRU (Least Recently Used) cache implementation for JavaScript and TypeScript.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

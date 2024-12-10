@@ -1,5 +1,4 @@
-import { LinkedNode } from "./interfaces";
-import { isLocalhost } from "./utils";
+import { LinkedNode } from './interfaces'
 
 /**
  * @template T
@@ -7,24 +6,24 @@ import { isLocalhost } from "./utils";
  * Allows for efficient storage and retrieval of key-value pairs.
  */
 export default class LRUCache<T> {
-  private static instance: LRUCache<any>;
-  private readonly capacity: number;
-  private readonly hash: Map<string, LinkedNode<T>>;
-  private head?: LinkedNode<T>;
-  private tail?: LinkedNode<T>;
+  private static instance: LRUCache<any>
+  private readonly capacity: number
+  private readonly hash: Map<string, LinkedNode<T>>
+  private head?: LinkedNode<T>
+  private tail?: LinkedNode<T>
 
-  private hitCount: number;
-  private missCount: number;
-  private evictionCount: number;
+  private hitCount: number
+  private missCount: number
+  private evictionCount: number
 
-  private constructor(capacity: number) {
-    this.capacity = capacity;
-    this.hash = new Map();
+  private constructor (capacity: number) {
+    this.capacity = capacity
+    this.hash = new Map()
     this.head = this.tail = undefined;
 
-    (globalThis as any).debugLRU = this.debugLRU.bind(this);
+    (globalThis as any).debugLRU = this.debugLRU.bind(this)
 
-    this.hitCount = this.missCount = this.evictionCount = 0;
+    this.hitCount = this.missCount = this.evictionCount = 0
   }
 
   /**
@@ -34,10 +33,10 @@ export default class LRUCache<T> {
    * @returns {LRUCache<T>} The singleton instance of the cache.
    */
   public static getInstance<T>(capacity: number = 10): LRUCache<T> {
-    if (!LRUCache.instance) {
-      LRUCache.instance = new LRUCache<T>(capacity);
+    if (LRUCache.instance == null) {
+      LRUCache.instance = new LRUCache<T>(capacity)
     }
-    return LRUCache.instance;
+    return LRUCache.instance
   }
 
   /**
@@ -49,24 +48,24 @@ export default class LRUCache<T> {
    * @param {number} [ttl=60000] - Time-to-Live in milliseconds for the item.
    * @returns {LRUCache<T>} The current cache instance for chaining.
    */
-  public put(key: string, value: T, ttl: number = 60_000): LRUCache<T> {
+  public put (key: string, value: T, ttl: number = 60_000): LRUCache<T> {
     const now = Date.now()
-    let node = this.hash.get(key);
-    if (node) {
-      this.evict(node);
+    let node = this.hash.get(key)
+    if (node != null) {
+      this.evict(node)
     }
 
-    node = this.prepend(key, value, now + ttl);
-    this.hash.set(key, node);
+    node = this.prepend(key, value, now + ttl)
+    this.hash.set(key, node)
     if (this.hash.size > this.capacity) {
-      const tailNode = this.pop();
-      if (tailNode) {
-        this.hash.delete(tailNode.key);
-        this.evictionCount++;
+      const tailNode = this.pop()
+      if (tailNode != null) {
+        this.hash.delete(tailNode.key)
+        this.evictionCount++
       }
     }
 
-    return this;
+    return this
   }
 
   /**
@@ -75,93 +74,93 @@ export default class LRUCache<T> {
    * @param {string} key - The key to search for.
    * @returns {T | undefined} The value associated with the key, or undefined if not found or expired.
    */
-  public get(key: string): T | undefined {
-    const node = this.hash.get(key);
-    if (!node) {
-      this.missCount++;
-      return undefined;
-    }
-
-    this.evict(node);
-
-    const now = Date.now()
-    if (node.ttl < now) {
-      this.missCount++;
+  public get (key: string): T | undefined {
+    const node = this.hash.get(key)
+    if (node == null) {
+      this.missCount++
       return undefined
     }
 
-    this.prepend(node.key, node.value, node.ttl);
-    this.hitCount++;
-    return node.value;
+    this.evict(node)
+
+    const now = Date.now()
+    if (node.ttl < now) {
+      this.missCount++
+      return undefined
+    }
+
+    this.prepend(node.key, node.value, node.ttl)
+    this.hitCount++
+    return node.value
   }
 
   /**
    * Clears all items from the cache.
    */
-  public clear(): void {
+  public clear (): void {
     this.hash.clear()
     this.head = this.tail = undefined
     this.clearMetrics()
   }
 
-  private prepend(key: string, value: T, ttl: number): LinkedNode<T> {
-    const node: LinkedNode<T> = { key, value, ttl };
-    this.hash.set(key, node);
+  private prepend (key: string, value: T, ttl: number): LinkedNode<T> {
+    const node: LinkedNode<T> = { key, value, ttl }
+    this.hash.set(key, node)
 
-    if (!this.head) {
-      this.head = this.tail = node;
+    if (this.head == null) {
+      this.head = this.tail = node
     } else {
-      node.next = this.head;
-      this.head.prev = node;
-      this.head = node;
+      node.next = this.head
+      this.head.prev = node
+      this.head = node
     }
 
-    return node;
+    return node
   }
 
-  private pop(): LinkedNode<T> | undefined {
-    const node = this.tail;
-    if (!node) return;
+  private pop (): LinkedNode<T> | undefined {
+    const node = this.tail
+    if (node == null) return
 
-    if (this.tail && this.tail.prev) {
-      this.tail.prev.next = undefined;
-      this.tail = this.tail.prev;
+    if (this.tail?.prev != null) {
+      this.tail.prev.next = undefined
+      this.tail = this.tail.prev
     } else {
-      this.head = this.tail = undefined;
+      this.head = this.tail = undefined
     }
 
-    node.prev = undefined;
-    return node;
+    node.prev = undefined
+    return node
   }
 
-  private evict(node: LinkedNode<T>): void {
-    if (node.prev !== undefined) node.prev.next = node.next;
-    if (node.next !== undefined) node.next.prev = node.prev;
-    if (node === this.head) this.head = node.next;
-    if (node === this.tail) this.tail = node.prev;
+  private evict (node: LinkedNode<T>): void {
+    if (node.prev !== undefined) node.prev.next = node.next
+    if (node.next !== undefined) node.next.prev = node.prev
+    if (node === this.head) this.head = node.next
+    if (node === this.tail) this.tail = node.prev
     node.next = node.prev = undefined
     this.hash.delete(node.key)
   }
 
-  private getHitRate(): number {
-    const totalRequests = this.hitCount + this.missCount;
-    return totalRequests === 0 ? 0 : this.hitCount / totalRequests;
+  private getHitRate (): number {
+    const totalRequests = this.hitCount + this.missCount
+    return totalRequests === 0 ? 0 : this.hitCount / totalRequests
   }
 
-  private getMissRate(): number {
-    const totalRequests = this.hitCount + this.missCount;
-    return totalRequests === 0 ? 0 : this.missCount / totalRequests;
+  private getMissRate (): number {
+    const totalRequests = this.hitCount + this.missCount
+    return totalRequests === 0 ? 0 : this.missCount / totalRequests
   }
 
-  private getEvictionRate(): number {
-    const totalRequests = this.hitCount + this.missCount;
-    return totalRequests === 0 ? 0 : this.evictionCount / totalRequests;
+  private getEvictionRate (): number {
+    const totalRequests = this.hitCount + this.missCount
+    return totalRequests === 0 ? 0 : this.evictionCount / totalRequests
   }
 
   /**
    * Resets cache performance metrics.
    */
-  public clearMetrics(): void {
+  public clearMetrics (): void {
     this.hitCount = this.missCount = this.evictionCount = 0
   }
 
@@ -169,17 +168,17 @@ export default class LRUCache<T> {
    * Logs cache performance metrics to the console.
    * Includes hit rate, miss rate, and eviction rate.
    */
-  public logMetrics(): void {
-    console.log(`Hit rate: ${this.getHitRate()}`);
-    console.log(`Miss rate: ${this.getMissRate()}`);
-    console.log(`Eviction rate: ${this.getEvictionRate()}`);
+  public logMetrics (): void {
+    console.log(`Hit rate: ${this.getHitRate()}`)
+    console.log(`Miss rate: ${this.getMissRate()}`)
+    console.log(`Eviction rate: ${this.getEvictionRate()}`)
   }
 
   /**
    * Logs debugging information about the cache to the console.
    * Includes the current state of the linked list and the hash map.
    */
-  public debugLRU(): void {
+  public debugLRU (): void {
     console.log('DEBUG LRU CACHE ⚡')
     let node: LinkedNode<T> | undefined = this.head
     for (let i = 0; node !== undefined && i < this.capacity; i++) {

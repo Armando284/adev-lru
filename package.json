@@ -50,6 +50,8 @@
       "dist",
       "src/**/*.js"
     ]
+  },
+  "dependencies": {
+    "adev-monads": "^2.1.0"
   }
-
 }

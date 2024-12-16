@@ -95,4 +95,33 @@ describe('LRUCache Tests', () => {
 
     debugSpy.mockRestore()
   })
+
+  test('getOption should return Option.some when the key exists and is not expired', () => {
+    const key = 'testKey'
+    const value = 'testValue'
+
+    const ttl = Date.now() + 1000
+    cache.put(key, value, ttl)
+
+    const result = cache.getOption(key)
+
+    expect(result.isSome()).toBe(true)
+    expect(result.getOrElse('defaultValue')).toBe(value)
+  })
+
+  test('getOption should return Option.none when the key does not exist or is expired', () => {
+    const key = 'missingKey'
+
+    let result = cache.getOption(key)
+    expect(result.isNone()).toBe(true)
+
+    const expiredKey = 'expiredKey'
+    const expiredValue = 'expiredValue'
+    const ttl = -1000
+    cache.put(expiredKey, expiredValue, ttl)
+
+    result = cache.getOption(expiredKey)
+
+    expect(result.isNone()).toBe(true)
+  })
 })

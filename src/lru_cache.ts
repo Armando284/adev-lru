@@ -56,7 +56,7 @@ export class LRUCache<T> {
     let node = this.hash.get(key)
     if (node != null) {
       this.evict(node)
-      this.log = this.log.flatMap(() => Writer.tell(`Evicted key: ${key}`));
+      this.log = this.log.flatMap(() => Writer.tell(`Evicted key: ${key}`))
     }
 
     node = this.prepend(key, value, now + ttl)
@@ -66,10 +66,10 @@ export class LRUCache<T> {
       if (tailNode != null) {
         this.hash.delete(tailNode.key)
         this.evictionCount++
-        this.log = this.log.flatMap(() => Writer.tell(`Evicted key: ${tailNode.key}`));
+        this.log = this.log.flatMap(() => Writer.tell(`Evicted key: ${tailNode.key}`))
       }
     }
-    this.log = this.log.flatMap(() => Writer.tell(`Added key: ${key} to cache`));
+    this.log = this.log.flatMap(() => Writer.tell(`Added key: ${key} to cache`))
     return this
   }
 
@@ -84,7 +84,7 @@ export class LRUCache<T> {
     const now = Date.now()
     if (node == null || node.ttl < now) {
       this.missCount++
-      this.log = this.log.flatMap(() => Writer.tell(`Cache miss for key: ${key}`));
+      this.log = this.log.flatMap(() => Writer.tell(`Cache miss for key: ${key}`))
       return undefined
     }
 
@@ -92,7 +92,7 @@ export class LRUCache<T> {
 
     this.prepend(node.key, node.value, node.ttl)
     this.hitCount++
-    this.log = this.log.flatMap(() => Writer.tell(`Cache hit for key: ${key}`));
+    this.log = this.log.flatMap(() => Writer.tell(`Cache hit for key: ${key}`))
     return node.value
   }
 
@@ -113,7 +113,7 @@ export class LRUCache<T> {
     const now = Date.now()
     if (node == null || node.ttl < now) {
       this.missCount++
-      this.log = this.log.flatMap(() => Writer.tell(`Cache miss for key: ${key}`));
+      this.log = this.log.flatMap(() => Writer.tell(`Cache miss for key: ${key}`))
       return Option.none()
     }
 
@@ -121,7 +121,7 @@ export class LRUCache<T> {
 
     this.prepend(node.key, node.value, node.ttl)
     this.hitCount++
-    this.log = this.log.flatMap(() => Writer.tell(`Cache hit for key: ${key}`));
+    this.log = this.log.flatMap(() => Writer.tell(`Cache hit for key: ${key}`))
     return Option.some(node.value)
   }
 
@@ -131,7 +131,7 @@ export class LRUCache<T> {
   public clear (): void {
     this.hash.clear()
     this.head = this.tail = undefined
-    this.log = this.log.flatMap(() => Writer.tell('Cache cleared'));
+    this.log = this.log.flatMap(() => Writer.tell('Cache cleared'))
     this.clearMetrics()
   }
 
@@ -204,7 +204,7 @@ export class LRUCache<T> {
     console.log(`Hit rate: ${this.getHitRate()}`)
     console.log(`Miss rate: ${this.getMissRate()}`)
     console.log(`Eviction rate: ${this.getEvictionRate()}`)
-    return this.log;
+    return this.log
   }
 
   /**

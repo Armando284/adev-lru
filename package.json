@@ -1,11 +1,23 @@
 {
   "name": "adev-lru",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "description": "A lightweight and efficient LRU (Least Recently Used) cache implementation for JavaScript and TypeScript.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/esm/index.js"
+  },
+  "type": "module",
+  "engines":{
+    "node": ">=12"
+  },
   "scripts": {
-    "build": "tsc",
+    "build:esm": "tsc --project tsconfig.esm.json",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:types": "tsc --project tsconfig.types.json",
+    "build": "npm run build:types && npm run build:esm && npm run build:cjs",
     "test": "jest",
     "lint": "ts-standard --fix",
     "prepare": "npm run build",
@@ -52,6 +64,6 @@
     ]
   },
   "dependencies": {
-    "adev-monads": "^2.1.0"
+    "adev-monads": "^2.2.0"
   }
 }

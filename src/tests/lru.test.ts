@@ -1,4 +1,4 @@
-import LRUCache from '../index'
+import { LRUCache } from '../index'
 
 describe('LRUCache Tests', () => {
   let cache: LRUCache<string>

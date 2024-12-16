@@ -74,10 +74,11 @@ describe('LRUCache Tests', () => {
 
     // Assuming logMetrics prints the metrics, we can mock console.log to verify
     const logSpy = jest.spyOn(console, 'log')
-    cache.logMetrics()
+    const log = cache.logMetrics()
 
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Hit rate: 0.6666')) // 2/3
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Miss rate: 0.3333')) // 1/3
+    expect(log.getLog().length).toBeGreaterThan(0)
 
     logSpy.mockRestore()
   })

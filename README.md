@@ -89,6 +89,15 @@ For a more in-depth explanation of how the LRU Cache works, refer to the [Guide]
 - **Returns**:
   - The cached value if it exists and is not expired. Otherwise, `undefined`.
 
+### `LRUCache.getOption(key: string): Option<T>`
+
+- **Parameters**:
+  - key (string): The key of the cache entry to retrieve.
+- **Returns**:
+  - An Option<T> instance:
+    - Option.some(value) if the key exists in the cache and has not expired.
+    - Option.none() if the key does not exist or has expired.
+
 ### `LRUCache.clear(): void`
 
 - Clears the cache.

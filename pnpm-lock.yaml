@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   adev-monads:
-    specifier: ^2.1.0
-    version: 2.1.0
+    specifier: ^2.2.0
+    version: 2.2.0
 
 devDependencies:
   '@types/jest':
@@ -951,8 +951,9 @@ packages:
     hasBin: true
     dev: true
 
-  /adev-monads@2.1.0:
-    resolution: {integrity: sha512-dMyip/Ldilt3y7WDDgFtiJpxWg7shBB7j+yjZ6mfqK9yVv/sjtO14Jt65N2lxvhP0Ywn51yPcenzaoKCxngY0Q==}
+  /adev-monads@2.2.0:
+    resolution: {integrity: sha512-oGiDjhobb/87TVi3X2bRETbks7CBqkdKxxsYMlGf0vBbULZUCbu2o0HSYNqdfDZnrIgIfNakF4zUKzt5QVbuRA==}
+    engines: {node: '>=12'}
     dev: false
 
   /ajv@6.12.6:

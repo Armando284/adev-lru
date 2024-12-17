@@ -55,8 +55,7 @@ export class LRUCache<T> {
     const now = Date.now()
     let node = this.hash.get(key)
     if (node != null) {
-      this.evict(node)
-      this.log = this.log.flatMap(() => Writer.tell(`Evicted key: ${key}`))
+      this.removeFromPosition(node)
     }
 
     node = this.prepend(key, value, now + ttl)
@@ -88,7 +87,7 @@ export class LRUCache<T> {
       return undefined
     }
 
-    this.evict(node)
+    this.removeFromPosition(node)
 
     this.prepend(node.key, node.value, node.ttl)
     this.hitCount++
@@ -117,7 +116,7 @@ export class LRUCache<T> {
       return Option.none()
     }
 
-    this.evict(node)
+    this.removeFromPosition(node)
 
     this.prepend(node.key, node.value, node.ttl)
     this.hitCount++
@@ -165,7 +164,7 @@ export class LRUCache<T> {
     return node
   }
 
-  private evict (node: LinkedNode<T>): void {
+  private removeFromPosition (node: LinkedNode<T>): void {
     if (node.prev !== undefined) node.prev.next = node.next
     if (node.next !== undefined) node.next.prev = node.prev
     if (node === this.head) this.head = node.next

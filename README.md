@@ -64,6 +64,81 @@ console.log(cache.get('b')); // Output: undefined (evicted)
 
 For a more in-depth explanation of how the LRU Cache works, refer to the [Guide](GUIDE.md).
 
+## Using Persistence Systems
+
+The `LRUCache` library supports optional data persistence to ensure cached data remains available between sessions or system restarts. This can be achieved using one of the following adapters:
+
+1. **LocalStorageAdapter**
+   - Stores cache data in the browser's `localStorage`. Suitable for lightweight use cases with limited storage requirements.
+
+2. **IndexedDBAdapter**
+   - Uses the browser's `IndexedDB` for more robust and scalable data persistence, handling larger datasets effectively.
+
+### Behavior with Persistence
+When a persistence adapter is configured, the cache:
+- **Reloads Data in Memory**: On initialization, cached data is loaded into memory for fast access.
+- **Maintains Consistency**: Updates to the cache are mirrored in the persistence layer in real-time.
+
+### Example: Configuring Persistence Adapters
+
+Here’s how to set up the cache with persistence:
+
+```typescript
+import {LRUCache, LocalStorageAdapter, IndexedDBAdapter} from 'adev-lru';
+
+// Example 1: Using LocalStorageAdapter
+const localStorageAdapter = new LocalStorageAdapter('my-cache');
+const cacheWithLocalStorage = LRUCache.getInstance<number>({
+  capacity: 5,
+  adapter: localStorageAdapter,
+});
+
+// Example 2: Using IndexedDBAdapter
+const indexedDBAdapter = new IndexedDBAdapter('myDatabase', 'myStore');
+const cacheWithIndexedDB = LRUCache.getInstance<number>({
+  capacity: 5,
+  adapter: indexedDBAdapter,
+});
+
+// Usage remains the same
+cacheWithLocalStorage.put('a', 1);
+cacheWithIndexedDB.put('b', 2);
+console.log(cacheWithLocalStorage.get('a')); // Output: 1
+console.log(cacheWithIndexedDB.get('b')); // Output: 2
+```
+
+### Handling Concurrency in Multithreaded Environments
+
+When using the cache in parallel systems like web workers or threads, it is critical to:
+- **Create a Single Cache Instance**: Export a single shared instance of the cache for all threads to use. 
+- **Avoid Independent Instantiations**: This prevents concurrency issues, ensuring consistent access to the same underlying data.
+
+#### Example: Correct Multithreaded Setup
+
+In your main thread or a shared module:
+
+```typescript
+import LRUCache from 'adev-lru';
+
+const sharedCache = LRUCache.getInstance<number>(3);
+
+export default sharedCache;
+```
+
+In worker threads or other parallel systems:
+
+```typescript
+import sharedCache from './sharedCache';
+
+sharedCache.put('a', 42);
+console.log(sharedCache.get('a')); // Output: 42
+```
+
+### Notes
+
+- **Performance**: By keeping data in memory, the cache ensures rapid access times, even when using persistence adapters.
+- **Concurrency Safety**: Following the shared instance model minimizes the risk of race conditions or data inconsistency.
+
 ## API
 
 ### `LRUCache.getInstance<T>(capacity: number): LRUCache<T>`

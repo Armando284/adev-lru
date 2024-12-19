@@ -1,5 +1,6 @@
 import { LinkedNode } from './interfaces'
 import { Option, Writer } from 'adev-monads'
+import { StorageAdapter } from './storage_adapter'
 
 /**
  * @template T
@@ -18,8 +19,24 @@ export class LRUCache<T> {
   private missCount: number
   private evictionCount: number
 
-  private constructor (capacity: number) {
+  private readonly storageAdapter?: StorageAdapter
+
+  private constructor (capacity: number, storageAdapter?: StorageAdapter) {
     this.capacity = capacity
+
+    this.storageAdapter = storageAdapter
+    if (this.storageAdapter !== undefined && this.storageAdapter instanceof StorageAdapter) {
+      // Start DB
+      this.storageAdapter.connect()
+      // Warm up Cache with DB data
+      this.storageAdapter.getAll().then(data => {
+        for (const key in data) {
+          const element = data[key] as T
+          this.put(key, element)
+        }
+      })
+    }
+
     this.hash = new Map()
     this.head = this.tail = undefined;
 
@@ -35,9 +52,9 @@ export class LRUCache<T> {
    * @param {number} [capacity=10] - Maximum capacity of the cache.
    * @returns {LRUCache<T>} The singleton instance of the cache.
    */
-  public static getInstance<T>(capacity: number = 10): LRUCache<T> {
+  public static getInstance<T>(capacity: number = 10, storageAdapter?: StorageAdapter): LRUCache<T> {
     if (LRUCache.instance == null) {
-      LRUCache.instance = new LRUCache<T>(capacity)
+      LRUCache.instance = new LRUCache<T>(capacity, storageAdapter)
     }
     return LRUCache.instance
   }
@@ -64,11 +81,15 @@ export class LRUCache<T> {
       const tailNode = this.pop()
       if (tailNode != null) {
         this.hash.delete(tailNode.key)
+        this.storageAdapter?.delete(key)
         this.evictionCount++
         this.log = this.log.flatMap(() => Writer.tell(`Evicted key: ${tailNode.key}`))
       }
     }
+
     this.log = this.log.flatMap(() => Writer.tell(`Added key: ${key} to cache`))
+    this.storageAdapter?.add(key, value)
+
     return this
   }
 
@@ -129,6 +150,7 @@ export class LRUCache<T> {
    */
   public clear (): void {
     this.hash.clear()
+    this.storageAdapter?.clear()
     this.head = this.tail = undefined
     this.log = this.log.flatMap(() => Writer.tell('Cache cleared'))
     this.clearMetrics()

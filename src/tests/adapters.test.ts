@@ -1,8 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { LRUCache } from '../index'
-import { LocalStorageAdapter } from '../index'
+import { LRUCache, LocalStorageAdapter } from '../index'
 
 describe('LRUCache with LocalStorageAdapter', () => {
   let cache: LRUCache<string>
@@ -58,7 +57,7 @@ describe('LRUCache with LocalStorageAdapter', () => {
   test('should persist elements in localStorage', async () => {
     await cache.put('key1', 'value1')
 
-    const storedData = JSON.parse(localStorage.getItem(storeName) || '{}')
+    const storedData = JSON.parse(localStorage.getItem(storeName) ?? '{}')
     expect(storedData).not.toBeNull()
     expect(storedData.key1).toEqual('value1')
   })

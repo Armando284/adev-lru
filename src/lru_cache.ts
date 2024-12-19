@@ -27,14 +27,14 @@ export class LRUCache<T> {
     this.storageAdapter = storageAdapter
     if (this.storageAdapter !== undefined && this.storageAdapter instanceof StorageAdapter) {
       // Start DB
-      this.storageAdapter.connect()
+      this.storageAdapter.connect().catch(error => { throw new Error(error) })
       // Warm up Cache with DB data
       this.storageAdapter.getAll().then(data => {
         for (const key in data) {
           const element = data[key] as T
           this.put(key, element)
         }
-      })
+      }).catch(error => { throw new Error(error) })
     }
 
     this.hash = new Map()
@@ -81,14 +81,14 @@ export class LRUCache<T> {
       const tailNode = this.pop()
       if (tailNode != null) {
         this.hash.delete(tailNode.key)
-        this.storageAdapter?.delete(key)
+        this.storageAdapter?.delete(key).catch(error => { throw new Error(error) })
         this.evictionCount++
         this.log = this.log.flatMap(() => Writer.tell(`Evicted key: ${tailNode.key}`))
       }
     }
 
     this.log = this.log.flatMap(() => Writer.tell(`Added key: ${key} to cache`))
-    this.storageAdapter?.add(key, value)
+    this.storageAdapter?.add(key, value).catch(error => { throw new Error(error) })
 
     return this
   }
@@ -150,7 +150,7 @@ export class LRUCache<T> {
    */
   public clear (): void {
     this.hash.clear()
-    this.storageAdapter?.clear()
+    this.storageAdapter?.clear().catch(error => { throw new Error(error) })
     this.head = this.tail = undefined
     this.log = this.log.flatMap(() => Writer.tell('Cache cleared'))
     this.clearMetrics()

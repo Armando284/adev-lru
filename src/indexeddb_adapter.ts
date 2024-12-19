@@ -16,7 +16,7 @@ export class IndexedDBAdapter extends StorageAdapter {
    * @param {string} [dbName='cacheDB'] - The name of the database.
    * @param {string} [storeName='cacheStore'] - The name of the object store.
    */
-  constructor(dbName: string = 'cacheDB', storeName: string = 'cacheStore') {
+  constructor (dbName: string = 'cacheDB', storeName: string = 'cacheStore') {
     super()
     this.dbName = dbName
     this.storeName = storeName
@@ -27,7 +27,7 @@ export class IndexedDBAdapter extends StorageAdapter {
    *
    * @returns {Promise<void>} A promise that resolves once the connection is ready.
    */
-  async connect(): Promise<void> {
+  async connect (): Promise<void> {
     return await new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, 1)
 
@@ -54,7 +54,7 @@ export class IndexedDBAdapter extends StorageAdapter {
    * @param {unknown} value - The value to store.
    * @returns {Promise<void>} A promise that resolves once the data is stored.
    */
-  async add(key: string, value: unknown): Promise<void> {
+  async add (key: string, value: unknown): Promise<void> {
     await this._withTransaction('readwrite', (store) => store.put({ key, value }))
   }
 
@@ -64,11 +64,11 @@ export class IndexedDBAdapter extends StorageAdapter {
    * @param {string} key - The key to retrieve.
    * @returns {Promise<unknown | null>} A promise resolving to the value, or null if the key doesn't exist.
    */
-  async get(key: string): Promise<unknown | null> {
+  async get (key: string): Promise<unknown | null> {
     return await this._withTransaction<unknown | null>('readonly', async (store) => {
       const request = store.get(key)
       return await this._promisifyRequest(request).then((result) =>
-        result ? (result as { key: string, value: unknown }).value : null
+        result != null ? (result as { key: string, value: unknown }).value : null
       )
     })
   }
@@ -78,7 +78,7 @@ export class IndexedDBAdapter extends StorageAdapter {
    *
    * @returns {Promise<Record<string, unknown>>} A promise resolving to an object containing all stored data.
    */
-  async getAll(): Promise<Record<string, unknown>> {
+  async getAll (): Promise<Record<string, unknown>> {
     return await this._withTransaction<Record<string, unknown>>('readonly', async (store) => {
       const request = store.getAll()
       return await this._promisifyRequest(request).then((results) => {
@@ -97,7 +97,7 @@ export class IndexedDBAdapter extends StorageAdapter {
    * @param {string} key - The key to delete.
    * @returns {Promise<void>} A promise that resolves once the key is deleted.
    */
-  async delete(key: string): Promise<void> {
+  async delete (key: string): Promise<void> {
     await this._withTransaction('readwrite', (store) => store.delete(key))
   }
 
@@ -106,7 +106,7 @@ export class IndexedDBAdapter extends StorageAdapter {
    *
    * @returns {Promise<void>} A promise that resolves once the data is cleared.
    */
-  async clear(): Promise<void> {
+  async clear (): Promise<void> {
     await this._withTransaction('readwrite', (store) => store.clear())
   }
 

@@ -6,6 +6,10 @@ A simple, efficient, and customizable **LRU Cache** (Least Recently Used Cache) 
 
 This package is suitable for use in caching data in client-side applications, backend services, or any application where frequently accessed data should be kept in memory.
 
+- [NPM Package](https://www.npmjs.com/package/adev-lru)
+- [How to Create an In-Memory Cache](https://dev.to/armando284/how-to-create-an-in-memory-cache-3ihe)
+- [Enhancing Cache with Configurable Data Persistence](https://dev.to/armando284/enhancing-lru-cache-with-configurable-data-persistence-37am)
+
 ## Features
 
 - **O(1) Access Time** for retrieving and inserting cache entries.
